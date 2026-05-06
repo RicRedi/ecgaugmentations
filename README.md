@@ -30,7 +30,7 @@ pip install -e .
 ## Quick Start
 
 ```python
-from ecg-augmentations import RandomNoiseAdder, HighPassFilter, SignalDrift
+from ecg_augmentations import RandomNoiseAdder, HighPassFilter, SignalDrift
 
 # Add Gaussian noise (recommended range: 0-10%)
 transform = RandomNoiseAdder(low_limit=0.0, high_limit=0.05,
