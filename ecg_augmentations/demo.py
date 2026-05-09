@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import h5py
 
-from augmentations import (
+from ecg_augmentations import (    #swith to "from augmentations" if you clone the repo before
     RandomNoiseAdder, PowerlineNoise, BaselineWander, EMGNoise,
     HighPassFilter, LowPassFilter, Scaling, RandomAmplitudeVariation,
     ClippingDistortion, SignalInverter, SignalDrift, SinusoidalStretching,
@@ -13,7 +13,7 @@ from augmentations import (
     SignalCrop,
 )
 
-SAMPLING_F = 500
+SAMPLING_F = 2000
 SIGNAL_LENGTH = 10000
 
 

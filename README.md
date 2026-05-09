@@ -9,7 +9,7 @@ Developed as part of a bachelor's thesis at VUT-FEKT (BUT-FEEC) (2026).
 pip install git+https://github.com/ShatovDaniil/ecg-augmentations.git
 ```
 
-Or clone and install locally:
+Or clone the full repository (required for the demo):
 
 ```bash
 git clone https://github.com/ShatovDaniil/ecg-augmentations.git
@@ -24,13 +24,13 @@ pip install -e .
 - numpy >= 1.21.0
 - scipy >= 1.7.0
 - wfdb >= 3.4.0
-- h5py>=3.0.0
-- matplotlib>=3.3.0
+- h5py >= 3.0.0
+- matplotlib >= 3.3.0
 
 ## Quick Start
 
 ```python
-from ecg-augmentations import RandomNoiseAdder, HighPassFilter, SignalDrift
+from ecg_augmentations import RandomNoiseAdder, HighPassFilter, SignalDrift
 
 # Add Gaussian noise (recommended range: 0-10%)
 transform = RandomNoiseAdder(low_limit=0.0, high_limit=0.05,
@@ -47,6 +47,22 @@ drift = SignalDrift(drift_type='linear', amplitude=0.03,
                     period=1.0, sampling_f=500, p=1.0, use_on='sample')
 drifted, marks = drift(signal, marks, global_apply_to_all=True)
 ```
+
+## Demo
+
+To run the demo, clone the repository (the demo script and sample
+signal file are not included in the pip package):
+
+```bash
+git clone https://github.com/ShatovDaniil/ecg-augmentations.git
+cd ecg-augmentations
+pip install -e .
+python demo.py
+```
+
+The demo applies selected augmentations to a real clinical ECG recording
+(`0000000b_00.h5`, SignalPlant 1.2.8.2, Fs = 2000 Hz) and plots
+a comparison of the original and augmented signal for each augmentation.
 
 ## Interface
 
@@ -87,12 +103,12 @@ augmented_signal, augmented_marks = transform(x, y, global_apply_to_all=True)
 | `EchoAdder` | Echo effect (delayed copy) | not recommended | dangerous |
 | `SignalArtefactAdder` | Random impulse artefacts | with caution | medium |
 | `ZeroOutSignal` | Random signal dropout | 0–40 % | safe |
-| `ZeroOutChannel` | Full channel zeroing | not recommended | critical |
+| `ZeroOutChannel` | Single channel zeroing (1 of N) | no limit | safe |
 | `SegmentShuffle` | Random segment reordering | not recommended | dangerous |
 | `RandomSignalReplacement` | Segment replacement from LUDB | 0–100 samples | medium |
 | `SignalTimeStretch` | Time stretching via interpolation | factor 0.9–1.3 | medium |
-| `DelaySimulation` | Signal delay simulation | 0–50 samples | dangerous |
-| `RandomTimeShift` | Random time shift | 0–±25 samples | dangerous |
+| `DelaySimulation` | Signal delay simulation | no limit | safe |
+| `RandomTimeShift` | Random time shift | no limit | safe |
 | `SignalCrop` | Signal cropping from start | 2500–5000 samples | medium |
 
 ## Robustness categories
@@ -102,7 +118,6 @@ Categories based on experimental testing on LUDB dataset using RPN model (F1 bas
 - **safe** — F1 does not drop below 95% of baseline at any intensity
 - **medium** — F1 drops below 90% only at higher intensity; use within recommended range
 - **dangerous** — F1 drops below 90% at low intensity; use with restriction or avoid
-- **critical** — causes complete model failure regardless of intensity
 
 ## License
 
