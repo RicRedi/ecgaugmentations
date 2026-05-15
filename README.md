@@ -84,40 +84,47 @@ augmented_signal, augmented_marks = transform(x, y, global_apply_to_all=True)
 | `p` | float | Probability of activation per call (0.0–1.0) |
 | `apply_to_all_channels` | bool | Apply to all channels regardless of `p` |
 
-## Available augmentations
+### Summary of Robustness Thresholds and Recommended Augmentation Ranges
 
-| Class | Description | Recommended range | Category |
-|---|---|---|---|
-| `RandomNoiseAdder` | Gaussian noise | 0–10 % | safe |
-| `PowerlineNoise` | 50 Hz powerline interference | 0–0.02 mV | dangerous |
-| `BaselineWander` | Low-frequency baseline drift (0.2 Hz) | 0–0.05 mV | medium |
-| `EMGNoise` | High-frequency muscle noise (>100 Hz) | 0–0.5 | medium |
-| `HighPassFilter` | FIR high-pass filter (Nuttall window) | 0.1–10 Hz | safe |
-| `LowPassFilter` | FIR low-pass filter (Nuttall window) | not recommended | dangerous |
-| `Scaling` | Global amplitude scaling | factor ±1.0 | medium |
-| `RandomAmplitudeVariation` | Local amplitude variation per segment | factor ±1.0 | medium |
-| `ClippingDistortion` | Amplitude clipping (amplifier saturation) | no limit | safe |
-| `SignalInverter` | Polarity inversion (×−1) | not recommended | dangerous |
-| `SignalDrift` | Baseline drift: linear / sinusoidal / random | 0–0.05 (linear/sin) | medium |
-| `SinusoidalStretching` | Sinusoidal amplitude modulation | 0–0.5 | medium |
-| `EchoAdder` | Echo effect (delayed copy) | not recommended | dangerous |
-| `SignalArtefactAdder` | Random impulse artefacts | with caution | medium |
-| `ZeroOutSignal` | Random signal dropout | 0–40 % | safe |
-| `ZeroOutChannel` | Single channel zeroing (1 of N) | no limit | safe |
-| `SegmentShuffle` | Random segment reordering | not recommended | dangerous |
-| `RandomSignalReplacement` | Segment replacement from LUDB | 0–100 samples | medium |
-| `SignalTimeStretch` | Time stretching via interpolation | factor 0.9–1.3 | medium |
-| `DelaySimulation` | Signal delay simulation | no limit | safe |
-| `RandomTimeShift` | Random time shift | no limit | safe |
-| `SignalCrop` | Signal cropping from start | 2500–5000 samples | medium |
+| Augmentation             | Recommended Range   | F1 at Threshold | Category         |
+| :----------------------- | :------------------ | :-------------: | :--------------- |
+| **ZeroOutSignal**        | 0–40 %              |      0.776      | Stable           |
+| **ZeroOutChannel**       | 1 channel out of N  |      0.773      | Stable           |
+| **ClippingDistortion**   | Unlimited           |      0.769      | Stable           |
+| **HighPassFilter**       | 0.1–10 Hz           |      0.759      | Stable           |
+| **DelaySimulation**      | Unlimited           |      0.776      | Stable           |
+| **RandomTimeShift**      | Unlimited           |      0.776      | Stable           |
+| **Scaling**              | Deviation $\pm$1.0  |      0.739      | Moderately Stable|
+| **RandomAmplitudeVariation**| Deviation $\pm$1.0|     0.735      | Moderately Stable|
+| **SignalDrift (Linear)** | Amplitude 0–0.05    |      0.737      | Moderately Stable|
+| **SignalDrift (Sinusoidal)**| Amplitude 0–0.05 |      0.734      | Moderately Stable|
+| **BaselineWander**       | 0–0.05 mV           |      0.734      | Moderately Stable|
+| **SinusoidalStretching** | Amplitude 0–0.5     |      0.707      | Moderately Stable|
+| **EMGNoise**             | Amplitude 0–0.5     |      0.705      | Moderately Stable|
+| **RandomNoise**          | 0–10 %              |      0.693      | Moderately Stable|
+| **SignalArtefactAdder**  | With caution        |      0.682      | Moderately Stable|
+| **RandomSignalReplacement**| 0–100 samples     |      0.729      | Moderately Stable|
+| **SignalTimeStretch**    | Factor 0.9–1.3      |      0.695      | Moderately Stable|
+| **SignalCrop**           | 2500–5000 samples   |      0.725      | Moderately Stable|
+| **SignalInverter**       | Not recommended     |      0.661      | Unstable         |
+| **PowerlineNoise**       | 0–0.02 mV           |      0.620      | Unstable         |
+| **SignalDrift (Random)** | 0–0.002             |      0.722      | Unstable         |
+| **EchoAdder**            | Not recommended     |      0.666      | Unstable         |
+| **LowPassFilter**        | Not recommended     |      0.460      | Unstable         |
+| **SegmentShuffle**       | Not recommended     |      0.405      | Unstable         |
 
-## Robustness categories
+---
 
-Categories based on experimental testing on LUDB dataset using RPN model (F1 baseline = 0.776):
+### Augmentation Categorization by Stability
 
-- **safe** — F1 does not drop below 95% of baseline at any intensity
-- **medium** — F1 drops below 90% only at higher intensity; use within recommended range
-- **dangerous** — F1 drops below 90% at low intensity; use with restriction or avoid
+Augmentations are divided into three categories based on the degree of F1-score degradation compared to the baseline value:
+
+* **Stable**
+  The F1-score does not drop below 95% of the baseline value even at high intensity. The augmentation can be used without restrictions.
+* **Moderately Stable**
+  The F1-score drops below 90% of the baseline value only at higher intensities. The augmentation can be used within the recommended range specified in the table.
+* **Unstable**
+  The F1-score drops below 90% of the baseline value even at low intensity or causes structural damage to the signal. Usage is not recommended, or should be strictly limited.or causes structural damage to the signal. Usage is not recommended, or should be strictly limited.
 
 ## License
 
